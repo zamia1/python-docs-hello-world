@@ -1,0 +1,37 @@
+
+
+<form name="myForm"  action =  "http://localhost:5000/category/{{data}}" method = "POST"> 
+<fieldset>
+    <legend>Select a report{{data}}</legend>
+  
+    <div>
+      <input type="radio" id="academic/preacademic" name="drone" value="academic/preacademic" checked />
+      <label for="academic/preacademic">Academic/Preacademic</label>
+    </div>
+  
+    <div>
+      <input type="radio" id="vocational/prevocational" name="drone" value="vocational/prevocational" />
+      <label for="vocational/prevocational">Vocational/Prevocational</label>
+    </div>
+  
+    <div>
+      <input type="radio" id="problemsolving" name="drone" value="problemsolving" />
+      <label for="problemsolving">ProblemSolving</label>
+    </div>
+    <div>
+        <input type="radio" id="DLA" name="drone" value="DLA" checked />
+        <label for="DLA">dla</label>
+      </div>
+    
+      <div>
+        <input type="radio" id="socialgoales" name="drone" value="socialgoales" />
+        <label for="socialgoales">SocialGoales</label>
+      </div>
+    
+      <div>
+        <input type="radio" id="communicationgoals" name="drone" value="communicationgoals" />
+        <label for="communicationgoals">CommunicationGoals</label>
+      </div>
+  </fieldset>
+  <p><input type=submit value=Next></p>
+  </form>

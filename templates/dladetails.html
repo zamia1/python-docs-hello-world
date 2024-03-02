@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongDB Flask App</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"/>
+</head>
+<body>
+    <h1>{{stu}}</h1>
+    <h1>{{degr}}</h1>
+	
+
+    <form action =  "http://localhost:5000/insert" method = "POST"> 
+        <input type="hidden" name="vehicle1" value={{stu}}>
+        <input type="hidden" name="degree" value={{degr}}>
+        <input type="hidden" name="bflag" value=False>
+        <p><h3>Date</h3></p> 
+        <p>
+            <input type="date" id="day" name="day">
+        </p>
+        <p><h3>রুম গোছানো</h3></p> 
+        <p><input type = 'text' name = 'রুম গোছানো'/></p>
+        <p><h3>টেবিল মুছা </h3></p> 
+        <p><input type = 'text' name = 'টেবিল মুছা'/></p>
+        <p><h3>কাপড় ভাঁজ </h3></p> 
+        <p><input type = 'text' name = 'কাপড় ভাঁজ'/></p>  
+        <p><h3>প্লেট ধোয়া</h3></p> 
+        <p><input type = 'text' name = 'প্লেট ধোয়া'/></p>  
+        <p><h3>টয়লেটিং</h3></p> 
+        <p><input type = 'text' name = 'টয়লেটিং'/></p>
+        <p><h3>ব্রাশে পেস্ট লাগানো</h3></p> 
+        <p><input type = 'text' name = 'রাশে পেস্ট লাগানো'/></p>  
+        <p><h3>ব্রাশ করা </h3></p> 
+        <p><input type = 'text' name = 'ব্রাশ করা'/></p>  
+        <p><h3>রুম ঝাড়ু </h3></p> 
+        <p><input type = 'text' name = 'রুম ঝাড়ু'/></p>  
+        <p><h3>টিস্যু </h3></p> 
+        <p><input type = 'text' name = 'টিস্যু '/></p>  
+        <p><h3>পানি</h3></p> 
+        <p><input type = 'text' name = 'পানি'/></p> 
+       
+       
+        <p><input type = 'submit' value = 'Submit'/></p> 
+        
+    </form>
+    </body>

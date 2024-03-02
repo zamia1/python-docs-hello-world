@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongDB Flask App</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"/>
+</head>
+<body>
+ 
+        <form action = "http://192.168.50.137:5000/filldata" method = "POST">   
+         <input type="hidden" name="vehicle1" value={{stu}}> 
+        <input type="hidden" name="degree" value={{degr}}>
+        <input type="hidden" name="date" value={{Date}}>
+        <input type="hidden" name="level" value={{levelo}}>     
+          <p><h3>{{Date}}</h3></p> 
+          <p><h3>{{levelo}}</h3></p> 
+          <p><h3>{{degr}}</h3></p> 
+          
+      {% for stud in rest %}	    
+           <p>{{ stud['Firstname'] }} <i>
+              {{ stud['Lastname'] }}</i>
+            </p>
+    {% endfor %}
+          <hr>
+          {% for key,value in students.items() %}	
+          <label for="level2">{{key}}:</label>
+               
+          
+           <select name="level2" id="level2">
+          {% for stn in value %} 
+            
+                
+                    <option value={{stn}}>{{stn}}</option>
+                  
+                 
+
+            {% endfor %}
+        </select> 
+        {% endfor %} 
+            <button type="submit">Submit</button>
+        
+        </form> 
+    </body>

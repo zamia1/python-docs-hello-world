@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  
+  <form method="GET" action="http://192.168.50.137:5000/"> 
+    <!-- <form method="GET" action="https://python-web-test-softpost-new.azurewebsites.net/"> -->
+     
+      <button type="submit" class="btn btn-primary"> Home</button>
+  </form>
+   
+
+<head>
+<script>
+
+   function downloadFile(data,name = document.getElementById("downloadfile").value) {
+ 
+ let test="";
+var resultsv=data;
+ jsonData = JSON.parse(resultsv);     
+for (let i = 0; i < jsonData.length; i++) {
+console.log(jsonData[i].day);
+if(i==0)
+{
+for (var key in jsonData[i]){
+  console.log(key);    
+  test+=key+',';
+}
+test+='\n';
+}
+
+for (var key in jsonData[i]){
+   
+  test+=jsonData[0][key]+',';
+  console.log(jsonData[0][key]);
+}
+test+="\n";
+}
+
+   
+    test+="";
+    const testh=test;
+   const blob =new Blob([testh],{type: "octet-stream"});
+   const href=URL.createObjectURL(blob);
+   const a =Object.assign(document.createElement("a"),{
+      href,
+      style: "display:none",
+      download: name,
+   });
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(href);
+  a.remove();
+ 
+}
+</script>
+</head>
+<body>
+<h2>Downloadable data below</h2>
+<table>
+  {% if results %}
+ <tr>
+    {% for key in results[0] %}
+    <th> {{ key }} </th>
+    {% endfor %}
+ </tr>
+ {% endif %} 
+
+ <!-- table rows -->
+  {% for dict_item in results %}
+ <tr>
+    {% for value in dict_item.values() %}
+    <td> {{ value }} </td>
+    {% endfor %}
+ </tr>
+ {% endfor %}
+
+
+</table> 
+
+<p><h3>Filename to download the data</h3></p> 
+<p><input type = 'text' name = 'filename' id="downloadfile"/></p> 
+<button type="button" onclick="downloadFile('{{result}}')">download</button>
+</body>
+</html>

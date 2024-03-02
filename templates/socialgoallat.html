@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongDB Flask App</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"/>
+</head>
+<body>
+    <h1>{{stu}}</h1>
+    <h1>{{degr}}</h1>
+
+    <form action =  "http://localhost:5000/insert" method = "POST"> 
+        <input type="hidden" name="vehicle1" value={{stu}}>
+        <input type="hidden" name="degree" value={{degr}}>
+        <input type="hidden" name="bflag" value=False>
+        <p><h3>Month</h3></p> 
+        <p><input type = 'text' name = 'month'/></p> 
+        <p><h3>Total Present</h3></p> 
+        <p><input type = 'text' name = 'total present'/></p>
+        <p><h3>Room Clean Performed</h3></p> 
+        <p><input type = 'text' name = 'Room Clean Performed'/></p>
+        <p><h3>Room Clean Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Room Clean Not Performed'/></p>
+        <p><h3>Table Clean Performed</h3></p> 
+        <p><input type = 'text' name = 'Table clean performed'/></p>  
+        <p><h3>Table clean Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Table clean Not Performed'/></p>  
+        <p><h3>Cloth Sorting Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Cloth Sorting Not Performed'/></p>
+        <p><h3>Cloth Sorting Performed</h3></p> 
+        <p><input type = 'text' name = 'Cloth Sorting Performed'/></p>  
+        <p><h3>Plate clean Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Plate clean Not Performed'/></p>  
+        <p><h3>Plate clean Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Plate clean Not Performed'/></p>  
+        <p><h3>Toileting(Tissue) Performed</h3></p> 
+        <p><input type = 'text' name = 'Toileting(Tissue) Performed'/></p>  
+        <p><h3>Toileting(Tissue) Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Toileting(Tissue) Not Performed'/></p>  
+        <p><h3>Toileting(Water) Performed</h3></p> 
+        <p><input type = 'text' name = 'Toileting(Water) Performed'/></p>  
+        <p><h3>Toileting(Water) Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Toileting(Water) Not Performed'/></p>  
+        <p><h3>Toileting(Water) Performed</h3></p> 
+        <p><input type = 'text' name = 'Toileting(Water) Performed'/></p>  
+        <p><h3>Brushing Teeth and Brush(Putting Paste) Performed</h3></p> 
+        <p><input type = 'text' name = 'Brushing Teeth and Brush(Putting Paste) Performed'/></p>  
+        <p><h3>Brushing Teeth and Brush(Putting Paste) Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Brushing Teeth and Brush(Putting Paste) Not Performed'/></p>  
+        <p><h3>Brooming Performed</h3></p> 
+        <p><input type = 'text' name = 'Broomimg Performed'/></p> 
+        <p><h3>Brooming Not Performed</h3></p> 
+        <p><input type = 'text' name = 'Broomimg Not Performed'/></p>  
+        <p><input type = 'submit' value = 'Submit'/></p> 
+        
+    </form>
+    </body>

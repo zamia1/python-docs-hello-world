@@ -1,0 +1,102 @@
+
+<html> 
+
+   <body>      
+    <h1>Home</h1>
+    <form action = "http://192.168.50.137:5000" method = "POST">
+          <button type="submit" class="btn btn-primary"> Home</button>
+    </form>
+    <form action = "http://192.168.50.137:5000/insert" method = "POST">
+            <p>
+              <input 
+              id="degree-0" 
+              name="degree" 
+              required 
+              type="radio" value="academicpreacademic">
+              <label for="degree-0">Academic Preacademic</label>
+          </p>
+          <p>
+              <input 
+              id="degree-1" 
+              name="degree" 
+              required 
+              type="radio" value="Receptive Communication">
+              <label for="degree-1">Receptive Communication</label>
+          </p>
+           <p>
+            <input 
+            id="degree-2" 
+            name="degree" 
+            required 
+            type="radio" value="dla">
+            <label for="degree-2">DLA</label>
+        </p>
+        <p>
+            <input 
+            id="degree-3" 
+            name="degree" 
+            required 
+            type="radio" value="problembehaviour">
+            <label for="degree-3">Problem Behaviour</label>
+        </p>
+        <p>
+          <input 
+          id="degree-4" 
+          name="degree" 
+          required 
+          type="radio" value="socialgoal">
+          <label for="degree-4">Social Goals</label>
+      </p> 
+      
+      
+  <p>
+      <input 
+      id="level1" 
+      name="level" 
+      required 
+      type="radio" value="level1">
+      <label for="level">level 1</label>
+  </p>
+  <p>
+    <input 
+    id="level2" 
+    name="level" 
+    required 
+    type="radio" value="level2">
+    <label for="level">level 2</label>
+</p> 
+<p>
+  <input 
+  id="level3" 
+  name="level" 
+  required 
+  type="radio" value="level3">
+  <label for="level">level 3</label>
+</p> 
+        <hr>
+        <p><h3>Date</h3></p> 
+        <p>
+            <input type="date" id="date" name="date">
+        </p>
+        <table id="mytab1">
+        <tr>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Age</th>
+            <th>Grade</th>
+          </tr>
+	{% for student in students %}	
+    <tr>   
+		 <td>{{ student['Firstname'] }} </td><td>{{ student['Lastname'] }}</td><td>{{ student['Age'] }}</td><td>{{ student['grade'] }}</td>
+            <td><input type="checkbox" id="vehicle1" name="vehicle1" value={{ student['_id'] }} ></td>
+          </tr>
+            {% endfor %}
+        </table>
+
+        
+            <button type="submit">Submit</button>
+        
+</form> 
+</body> 
+
+</html> 

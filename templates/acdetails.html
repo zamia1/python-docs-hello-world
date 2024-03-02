@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongDB Flask App</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"/>
+</head>
+<body>
+    <h1>{{stu}}</h1>
+    <h1>{{degr}}</h1>
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MongDB Flask App</title>
+        <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"/>
+    </head>
+    <body>
+        <h1>{{stu}}</h1>
+        <h1>{{degr}}</h1>
+        <!-- "http://localhost:5000/insert"  -->
+        <!-- <form action = "{{ url_for('insert') }}" method = "POST">  -->
+            <form action =  "http://localhost:5000/insert" method = "POST">
+            <input type="hidden" name="vehicle1" value={{stu}}>
+            <input type="hidden" name="degree" value={{degr}}>
+            <input type="hidden" name="bflag" value=False>
+            <p><h3>Date</h3></p> 
+            <p>
+                <input type="date" id="day" name="day">
+            </p>
+            <p><h3>Stiching</h3></p> 
+            <p><input type = 'text' name = 'Stiching'/></p>
+            <p><h3>Block</h3></p> 
+            <p><input type = 'text' name = 'Block'/></p>
+            <p><h3>Mala</h3></p> 
+            <p><input type = 'text' name = 'Mala'/></p>  
+            <p><h3>vege peeling</h3></p> 
+            <p><input type = 'text' name = 'Vege peeling'/></p>  
+            <p><input type = 'submit' value = 'Submit'/></p> 
+            
+        </form>
+        </body>

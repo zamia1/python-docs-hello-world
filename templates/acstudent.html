@@ -1,0 +1,20 @@
+
+
+    <table>
+        <thead>
+        <tr>
+            {% for header in headers %}
+            <th> {{headere}} </th>
+              {% endfor %}  
+        </tr>
+             </thead>
+             <tbody>
+             <tr>
+         {% for value in results %}   
+            <td>{{ value.Firstname }}</td>   
+         {% endfor %}
+              </tr>
+             
+      
+</tbody> 
+</table>
