@@ -3,7 +3,7 @@
 <html> 
 
    <body> 
-    <h1>Home</h1>
+ 
     <form method="GET" action="http://192.168.50.137:5000/"> 
       <!-- <form method="GET" action="https://python-web-test-softpost-new.azurewebsites.net/"> -->
        
@@ -12,8 +12,7 @@
      
 
       <form action = "http://192.168.50.137:5000/printstuff" method = "POST">  
-        <!-- <form method="POST" action="{{ url_for('printstuff') }}"> -->
-          <!-- <form method="POST" action="https://python-web-test-softpost-new.azurewebsites.net/printstuff"> -->
+      
         <p><h3>From Date</h3></p> 
         <p>
             <input type="date" id="fromday" name="fromday">
@@ -22,54 +21,63 @@
         <p>
             <input type="date" id="today" name="today">
         </p>
-          <p>
-              <input 
-              id="degree-0" 
-              name="degree" 
-              required 
-              type="radio" value="academicpreacademic">
-              <label for="degree-0">Academic Preacademic</label>
-          </p>
-          <p>
-              <input 
-              id="degree-1" 
-              name="degree" 
-              required 
-              type="radio" value="Receptive Communication">
-              <label for="degree-1">Receptive Communication</label>
-          </p>
-          <p>
-            <input 
-            id="degree-2" 
-            name="degree" 
-            required 
-            type="radio" value="dla">
-            <label for="degree-2">DLA</label>
-        </p>
-        <p>
-            <input 
-            id="degree-3" 
-            name="degree" 
-            required 
-            type="radio" value="problembehaviour">
-            <label for="degree-3">Problem Behaviour</label>
-        </p>
         <p>
           <input 
-          id="degree-4" 
+          id="degree-1" 
           name="degree" 
           required 
-          type="radio" value="socialgoal">
-          <label for="degree-4">Social Goals</label>
-      </p> 
+          type="radio" value="Receptive Communication">
+          <label for="degree-1">Receptive Communication</label>
+      </p>
       <p>
         <input 
-        id="degree-5" 
+        id="degree-0" 
         name="degree" 
         required 
-        type="radio" value="communicationgoal">
-        <label for="degree-5">Communication Goals</label>
-    </p> 
+        type="radio" value="Expressive Communication">
+        <label for="degree-0">Expressive Communication</label>
+    </p>
+       <p>
+        <input 
+        id="degree-2" 
+        name="degree" 
+        required 
+        type="radio" value="Social Skills">
+        <label for="degree-2">Social Skills</label>
+    </p>
+    <p>
+        <input 
+        id="degree-3" 
+        name="degree" 
+        required 
+        type="radio" value="Imitation">
+        <label for="degree-3">Imitation</label>
+    </p>
+    <p>
+      <input 
+      id="degree-4" 
+      name="degree" 
+      required 
+      type="radio" value="Play">
+      <label for="degree-4">Play</label>
+  </p> 
+  <p>
+    <input 
+    id="degree-5" 
+    name="degree" 
+    required 
+    type="radio" value="Fine Motor">
+    <label for="degree-5">Fine Motor</label>
+</p> 
+<p>
+    <input 
+    id="degree-6" 
+    name="degree" 
+    required 
+    type="radio" value="grossmotor">
+    <label for="degree-6">Gross Motor</label>
+</p> 
+
     <p>
       <input 
       id="level1" 
@@ -109,7 +117,7 @@
      
             <td>
              <input type="checkbox" id="vehicle1" name="vehicle1" value={{ student['_id'] }} ></td>
-<!-- <td>            <label for="vehicle1"> {{ student['Lastname'] }}</label> -->
+
         
     </tr>
       

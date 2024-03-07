@@ -56,8 +56,8 @@ test+="\n";
 </script>
 </head>
 <body>
-<h2>Downloadable data Name: {{firstname}} {{lastname}} <br>from date: {{fromdate}} todate::{{todate}}</h2>
-<h2>For level name :{{stlevel}}<br> and {{stegr}} </h2>
+<h2> Name: {{firstname}} {{lastname}} <br>from date: {{fromdate}} todate::{{todate}}</h2>
+<h2>level :{{stlevel}}<br> Category: {{stegr}} </h2>
 <table>
   {% if resultsheader %}
  <tr>
@@ -69,7 +69,7 @@ test+="\n";
  {% for rval in rresult %}
  <tr>
     {% for key,value in rval.items() %}
-    <td> {{ key }} </td><td> {{ value }} </td>
+    <td> {{ value }} </td>
     {% endfor %}
  </tr>
  {% endfor %}

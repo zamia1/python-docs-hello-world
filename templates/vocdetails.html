@@ -13,11 +13,8 @@
         <input type="hidden" name="stdegr" value="{{stdegr}}">
         <input type="hidden" name="stdate" value={{stdate}}>
         <input type="hidden" name="stlevel" value="{{stlevel}}"> 
-        <!-- <input type="hidden" name="stlevels" value="{{stlevels}}"> -->
         <input type="hidden" name="stname" value="{{stname}}">
-        <!-- <input type="hidden" name="stkeylevel" value="{{stkeylevel}}">
-        <input type="hidden" name="starraylevel" value="{{starraylevel}}">
-        <input type="hidden" name="stlevel" value="{{stlevel}}"> -->
+    
           <p><h3>{{stdate}}</h3></p> 
            <p><h3>{{stlevel}}</h3></p>  
           <p><h3>"{{stdegr}}"</h3></p> 
@@ -25,10 +22,11 @@
           <hr>
          
           {% for key,value in comblevels.items() %}	
-          <!-- <label for="levelall">{{key}}:</label> -->
+          
           <tr>
           <input type="checkbox" id="stkeylevel" name="stkeylevel" value="{{key}}" >{{key}}
-           <select name="levelall" id="levelall">
+           <!-- <select name="levelall" id="levelall"> -->
+            <select name="{{key}}" id="{{key}}"> 
           {% for name in value %} 
             
  

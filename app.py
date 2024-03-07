@@ -62,7 +62,7 @@ def data():
 
 @app.route('/printfill',methods=['POST','GET'])
 def printfill(): 
-    pdb.set_trace()
+#    pdb.set_trace()
     db = client.hopedatabase
     allstudents = db.datastudents
     slkey=request.form.getlist('selkeys')
@@ -85,20 +85,20 @@ def printfill():
         
         for eachd in li:
             if((eachd['Date'] >= request.form['fromd']) and (eachd['Date'] <= request.form['tod'])):
+                eachd['subcat']=stkey 
                 eachd['cat']=skey
-                eachd['subcat']=stkey
                 eachd['Firstname']=result[0]['Firstname']
                 eachd['Lastname']=result[0]['Lastname']
                 ee.append(eachd)
   
                  
-    pdb.set_trace()
+    #pdb.set_trace()
     output_file = open("dest_file", 'w', encoding='utf-8')
     for dic in flatten_list:
         json.dump(dic, output_file) 
         output_file.write("\n")
     if(ee):
-        return render_template('vocastudent.html', firstname=result[0]['Firstname'],lastname=result[0]['Lastname'], stlevel=stlevel,stegr=stdegr,fromdate=request.form['fromd'],todate=request.form['tod'],resultsheader=['Date','Performance','Firstname', 'Lastname','Category', 'Sub Category'],rresult=ee, resultd=json.dumps(ee),file="dest_file") 
+        return render_template('vocastudent.html', firstname=result[0]['Firstname'],lastname=result[0]['Lastname'], stlevel=stlevel,stegr=stdegr,fromdate=request.form['fromd'],todate=request.form['tod'],resultsheader=['Date','Performance','Category', 'Sub Category','Firstname', 'Lastname'],rresult=ee, resultd=json.dumps(ee),file="dest_file") 
     else:
         return jsonify ( message="No data found for this time period",category="error", status=404)
 
@@ -126,15 +126,15 @@ def printstuff():
             resdegree=result[0][level][degree]
             listkeys=[]
             stkeylevel=''
-            pdb.set_trace()
+            #pdb.set_trace()
             keylist=[]
             for key,value in resdegree.items():
                 keylist.append(key)
                 listkeys.append({key:list(value.keys())})
-            pdb.set_trace()
+            #pdb.set_trace()
             return render_template('levelstudents.html', lisk=listkeys,stuid=studentid,stdegr=degree,stlevel=level,fromd=request.form['fromday'],tod=request.form['today'])         
         else:
-            pdb.set_trace()
+            #pdb.set_trace()
             stkey=request.form['stkey']
             stuid=request.form['stuid']
             stlevel=request.form['stlevel']
@@ -148,7 +148,7 @@ def printstuff():
                 result.append(i)
             flatten_list=[]
             category=[]
-            pdb.set_trace()
+            #pdb.set_trace()
             finallist=[]
             for key,value in result[0][stlevel][stdegr][stkey].items():
                 finallist.append(key)
@@ -166,7 +166,7 @@ def printstuff():
             return jsonify ( message="No student found for this time period",category="error", status=404)
 def init(level,department):
     db = client.hopedatabase
-    levels = db.datalevels.find({})
+    levels = db.datalevels.find({'_id':ObjectId('65e579bdfc618e2bf00c686b')})
     result=[]
     for i in levels:
         result.append(i)
@@ -200,7 +200,7 @@ def checklevelper(level,degree,keydl,item,studentid,keytodata):
     result = []
     for i in per :
          result.append(i)
-    pdb.set_trace()
+    #pdb.set_trace()
     if (level not in result[0]) or (degree not in result[0][level]) or( keydl not in result[0][level][degree]) or (item not in result[0][level][degree][keydl]):
         return True
 
@@ -211,7 +211,7 @@ def checklevelper(level,degree,keydl,item,studentid,keytodata):
 
 @app.route( '/filldata',methods=['POST'])
 def filldata():
-    pdb.set_trace()
+    #pdb.set_trace()
     sdate=request.form['stdate']
     suid=request.form['stuid']
     sdegr=request.form['stdegr']
@@ -223,7 +223,7 @@ def filldata():
         if("bflag" not in request.form):
             rs="Performed,didnot Performed,and/or performed"
             perm=rs.split(',')
-            slevelone=request.form['levelall']
+            slevelone=request.form[skeylevel]
             return render_template('vocfilldata.html', performance=perm,sclicklevel=slevelone,stdate=sdate,stname=sname,stuid=suid,stdegr=sdegr,
                                stlevel=slevel, stkeylevel=skeylevel)
                              
@@ -246,6 +246,7 @@ def filldata():
 
 @app.route( '/insert',methods=['POST','GET'])
 def insert(): 
+    #pdb.set_trace()
     if request.method == "POST":
         date=request.form['date']
         studentid=request.form['vehicle1']
@@ -254,56 +255,19 @@ def insert():
         data=request.form.to_dict()
         namest=getname(studentid)
         stru={}
-        if degree == "Receptive Communication":
-            if 'bflag' not in request.form:
-                lislevel={}
-                lislevel1st2nd={}
-                lislevel=init(level,degree)
-                for levele in lislevel:
-                    jsond,arraylev=checklevel(levele,lislevel,studentid,degree,level,date)
-                    lislevel1st2nd[levele]=arraylev
-                pdb.set_trace()
-                return render_template('vocdetails.html',stdate=date,stname=namest,stuid=studentid,stlevel=level,stdegr=degree,comblevels=lislevel1st2nd)
-
-   
-            else:   
-                allstudents.update_one( { '_id':ObjectId(studentid) },{ "$addToSet" : {'Receptive Communication':[data] } } ,True)
-                return render_template('student.html', students=allstudents.find({}))
-   
-        elif degree == "academicpreacademic":
-            if 'bflag' not in request.form:
-                return render_template('acdetails.html',stu=studentid,degr=degree)
-            else:
-                allstudents.update_one( { '_id': ObjectId(studentid) },{ "$addToSet" : {'academicpreacademic':[data] }},True )
-                return render_template('student.html', students=allstudents.find({}))
-        elif degree == "dla":
-            if 'bflag' not in request.form:
-                return render_template('dladetails.html',stu=studentid,degr=degree)
-            else:
-                allstudents.update_one( { '_id': ObjectId(studentid) },{ "$addToSet" : {'dla':[data] }},True )
-                return render_template('student.html', students=allstudents.find({}))
-        elif degree == "problembehaviour":
-            if 'bflag' not in request.form:
-                return render_template('problembehav.html',stu=studentid,degr=degree)
-            else:
-                allstudents.update_one( { '_id': ObjectId(studentid) },{ "$addToSet" : {'problembehaviour':[data] }},True )
-                return render_template('student.html', students=allstudents.find({}))
-        elif degree == "socialgoal":
-            if 'bflag' not in request.form:
-                return render_template('socialgoal.html',stu=studentid,degr=degree)
-            else:
-                allstudents.update_one( { '_id': ObjectId(studentid) },{ "$addToSet" : {'socialgoals':[data] }},True )
-                return render_template('student.html', students=allstudents.find({}))
-        else:
-            if 'bflag' not in request.form:
-                return render_template('communicationgoal.html',stu=studentid,degr=degree)
-            else:
-                allstudents.update_one( { '_id': ObjectId(studentid) },{ "$addToSet" : {'communicationgoals':[data] }},True )
-                return render_template('student.html', students=allstudents.find({}))            
-    else: 
-       # pdb.set_trace()
-        return render_template('student.html', students=allstudents.find({}))
+        if 'bflag' not in request.form:
+            lislevel={}
+            lislevel1st2nd={}
+            lislevel=init(level,degree)
+            for levele in lislevel:
+                jsond,arraylev=checklevel(levele,lislevel,studentid,degree,level,date)
+                lislevel1st2nd[levele]=arraylev
+            #pdb.set_trace()
+            return render_template('vocdetails.html',stdate=date,stname=namest,stuid=studentid,stlevel=level,stdegr=degree,comblevels=lislevel1st2nd)
     
+    #pdb.set_trace()
+    return render_template('student.html', students=allstudents.find({}))
+   
 
 # main driver function
 if __name__ == '__main__':
