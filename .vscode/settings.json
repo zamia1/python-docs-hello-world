@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/cde0708b-f64f-4bdc-9e36-1036fdd0b4dd/resourceGroups/hopeexperiment/providers/Microsoft.Web/sites/python-web-test-softpost-new",
+    "appService.deploySubpath": "."
+}

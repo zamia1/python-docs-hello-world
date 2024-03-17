@@ -3,12 +3,15 @@
 
    <body>      
     
-    <form action = "http://192.168.50.137:5000" method = "POST">
-          <button type="submit" class="btn btn-primary"> Home</button>
+    <!-- <form action = "http://192.168.50.137:5000" method = "POST"> -->
+      <!-- <form action = "http://python-web-test-softpost-new.azurewebsites.net/" method = "POST"> -->
+        <form action = {{url}} method= "POST">
+        <button type="submit" class="btn btn-primary"> Home</button>
     </form>
-    <form action = "http://192.168.50.137:5000/insert" method = "POST">
-     
-          <p>
+    <!-- <form action = "http://192.168.50.137:5000/insert" method = "POST"> -->
+      <!-- <form action = "http://python-web-test-softpost-new.azurewebsites.net/insert" method = "POST"> -->
+        <form action = {{url}}/insert method = "POST"> 
+        <p>
               <input 
               id="degree-1" 
               name="degree" 

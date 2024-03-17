@@ -33,7 +33,12 @@ starraylevel={}
 stlevelone=''
 keydl=''
 bflag=True
-client = MongoClient('localhost', 27017)
+url= "http://python-web-test-softpost-new.azurewebsites.net/"
+#url= "http://127.0.0.1:5000"
+connection_string=os.environ.get('CONNECTION_STRING')
+#client = MongoClient('localhost', 27017)
+#client = MongoClient(connection_string)
+client = MongoClient("mongodb+srv://mongodb:mongodb@cluster0.ps5mh8y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 # Get and Post Route
 bflag=True
 db = client.hopedatabase
@@ -41,24 +46,24 @@ allstudents = db.datastudents
 @app.route('/index',methods=['GET'])
 @app.route('/',methods=['GET'])
 def index():
-    return render_template('home.html')
+    return render_template('home.html',url=url)
 
 
-@app.route('/data',methods=['POST','GET'])
+@app.route('/data',methods=['GET','POST'])
 def data(): 
-    #pdb.set_trace()
+   # pdb.set_trace()
     if request.method == "POST":
         db = client.hopedatabase
         allstudents = db.datastudents 
         data=request.form.to_dict()
         print(data)
         allstudents.insert_one(data)
-        return render_template('allstudent.html', students=allstudents.find({}))
+        return render_template('allstudent.html',url=url, students=allstudents.find({}))
     else:   
         db = client.hopedatabase
         allstudents = db.datastudents 
-
-        return render_template('allstudent.html', students=allstudents.find({}))
+        return render_template('allstudent.html', url=url,students=allstudents.find({}))
+  
 
 @app.route('/printfill',methods=['POST','GET'])
 def printfill(): 
@@ -152,7 +157,7 @@ def printstuff():
             finallist=[]
             for key,value in result[0][stlevel][stdegr][stkey].items():
                 finallist.append(key)
-            return render_template('finallevelstudents.html', stkey=stkey,catfinallist=finallist,stuid=stuid,stdegr=stdegr,stlevel=stlevel,fromd=request.form['fromd'],tod=request.form['tod'])         
+            return render_template('finallevelstudents.html', url=url,stkey=stkey,catfinallist=finallist,stuid=stuid,stdegr=stdegr,stlevel=stlevel,fromd=request.form['fromd'],tod=request.form['tod'])         
         
         
     else:
@@ -161,12 +166,12 @@ def printstuff():
         data=list(allstudents.find({}))
       
         if(data):
-            return render_template('studentprint.html', students=data)
+            return render_template('studentprint.html',url=url, students=data)
         else:
             return jsonify ( message="No student found for this time period",category="error", status=404)
 def init(level,department):
     db = client.hopedatabase
-    levels = db.datalevels.find({'_id':ObjectId('65e579bdfc618e2bf00c686b')})
+    levels = db.datalevels.find({'_id':ObjectId('65f54c63540fb6a68ccb1852')})
     result=[]
     for i in levels:
         result.append(i)
@@ -224,7 +229,7 @@ def filldata():
             rs="Performed,didnot Performed,and/or performed"
             perm=rs.split(',')
             slevelone=request.form[skeylevel]
-            return render_template('vocfilldata.html', performance=perm,sclicklevel=slevelone,stdate=sdate,stname=sname,stuid=suid,stdegr=sdegr,
+            return render_template('vocfilldata.html', url=url,performance=perm,sclicklevel=slevelone,stdate=sdate,stname=sname,stuid=suid,stdegr=sdegr,
                                stlevel=slevel, stkeylevel=skeylevel)
                              
         else:
@@ -240,13 +245,13 @@ def filldata():
           
             allstudents.update_one( { '_id': ObjectId(suid) },{ "$push" : {slevel+'.'+sdegr+'.'+request.form['stkeylevel']+'.'+request.form['sclicklevel']:[datedata] }})
           
-            return render_template('done.html',data="I am done")
+            return render_template('done.html',url=url,data="I am done")
         
 
 
 @app.route( '/insert',methods=['POST','GET'])
 def insert(): 
-    #pdb.set_trace()
+   # pdb.set_trace()
     if request.method == "POST":
         date=request.form['date']
         studentid=request.form['vehicle1']
@@ -266,12 +271,12 @@ def insert():
             return render_template('vocdetails.html',stdate=date,stname=namest,stuid=studentid,stlevel=level,stdegr=degree,comblevels=lislevel1st2nd)
     
     #pdb.set_trace()
-    return render_template('student.html', students=allstudents.find({}))
+    return render_template('student.html', url=url,students=allstudents.find({}))
    
 
-# main driver function
-if __name__ == '__main__':
+# # main driver function
+# if __name__ == '__main__':
  
-    # run() method of Flask class runs the application 
-    # on the local development server.
-    app.run(host='0.0.0.0')
+#     # run() method of Flask class runs the application 
+#     # on the local development server.
+#     app.run(host='0.0.0.0', port=5000, debug=True)

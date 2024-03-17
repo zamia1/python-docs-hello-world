@@ -6,6 +6,11 @@
     <title>MongDB Flask App</title>
 	<link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"/>
 </head>
+<form method="GET" action={{url}}> 
+    <!-- <form method="GET" action="https://python-web-test-softpost-new.azurewebsites.net/"> -->
+     
+      <button type="submit" class="btn btn-primary"> Home</button>
+  </form>
 <body>
     <form>
         <h1>{{data}}</h1>

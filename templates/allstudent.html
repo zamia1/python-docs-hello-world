@@ -8,10 +8,12 @@
 </head>
 <body>
   <h1>Home</h1>
-  <form method="GET" action="http://192.168.50.137:5000/">
+  <form method="GET" action={{url}}>
       <button type="submit" class="btn btn-primary"> Home</button>
   </form>
-<form action = "http://192.168.50.137:5000/data" method = "POST">  
+<!-- <form action = "http://192.168.50.137:5000/data" method = "POST">   -->
+  <!-- <form action = "http://python-web-test-softpost-new.azurewebsites.net/data" method = "POST"> -->
+    <form action = {{url}}/data method = "POST">
   <p><h3>Firstname</h3></p> 
         <p><input type = 'text' name = 'Firstname'/></p> 
         <p><h3>Lastname</h3></p> 
