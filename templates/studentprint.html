@@ -15,11 +15,11 @@
       
         <p><h3>From Date</h3></p> 
         <p>
-            <input type="date" id="fromday" name="fromday">
+            <input type="date" required id="fromday" name="fromday">
         </p>
         <p><h3>To Date</h3></p> 
         <p>
-            <input type="date" id="today" name="today">
+            <input type="date" required id="today" name="today">
         </p>
         <p>
           <input 
@@ -91,7 +91,7 @@
     id="level2" 
     name="level" 
     required 
-    type="radio" value="level2">
+    type="radio" disabled value="level2">
     <label for="level">level 2</label>
 </p> 
 <p>
@@ -99,7 +99,7 @@
   id="level3" 
   name="level" 
   required 
-  type="radio" value="level3">
+  type="radio" disabled value="level3">
   <label for="level">level 3</label>
 </p> 
       <table id="mytab1">
@@ -116,7 +116,7 @@
                     <td>{{ student['Firstname'] }}</td><td>{{student['Lastname'] }}</td><td>{{ student['Age'] }} </td> <td>{{ student['grade'] }} </td>  
      
             <td>
-             <input type="checkbox" id="vehicle1" name="vehicle1" value={{ student['_id'] }} ></td>
+             <input type="radio" required id="vehicle1" name="vehicle1" value={{ student['_id'] }} ></td>
 
         
     </tr>

@@ -81,7 +81,7 @@
     id="level2" 
     name="level" 
     required 
-    type="radio" value="level2">
+    type="radio" disabled value="level2">
     <label for="level">level 2</label>
 </p> 
 <p>
@@ -89,13 +89,13 @@
   id="level3" 
   name="level" 
   required 
-  type="radio" value="level3">
+  type="radio" disabled value="level3">
   <label for="level">level 3</label>
 </p> 
         <hr>
         <p><h3>Date</h3></p> 
         <p>
-            <input type="date" id="date" name="date">
+            <input type="date" required id="date" name="date">
         </p>
         <table id="mytab1">
         <tr>
@@ -107,7 +107,7 @@
 	{% for student in students %}	
     <tr>   
 		 <td>{{ student['Firstname'] }} </td><td>{{ student['Lastname'] }}</td><td>{{ student['Age'] }}</td><td>{{ student['grade'] }}</td>
-            <td><input type="checkbox" id="vehicle1" name="vehicle1" value={{ student['_id'] }} ></td>
+            <td><input type="radio" required id="vehicle1" name="vehicle1" value={{ student['_id'] }} ></td>
           </tr>
             {% endfor %}
         </table>

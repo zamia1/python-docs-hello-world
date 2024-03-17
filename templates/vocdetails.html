@@ -25,7 +25,7 @@
           {% for key,value in comblevels.items() %}	
           
           <tr>
-          <input type="checkbox" id="stkeylevel" name="stkeylevel" value="{{key}}" >{{key}}
+          <input type="radio" id="stkeylevel" name="stkeylevel" value="{{key}}" >{{key}}
            <!-- <select name="levelall" id="levelall"> -->
             <select name="{{key}}" id="{{key}}"> 
           {% for name in value %} 

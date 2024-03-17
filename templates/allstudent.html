@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}"/>
 </head>
 <body>
-  <h1>Home</h1>
+  
   <form method="GET" action={{url}}>
       <button type="submit" class="btn btn-primary"> Home</button>
   </form>
@@ -15,13 +15,13 @@
   <!-- <form action = "http://python-web-test-softpost-new.azurewebsites.net/data" method = "POST"> -->
     <form action = {{url}}/data method = "POST">
   <p><h3>Firstname</h3></p> 
-        <p><input type = 'text' name = 'Firstname'/></p> 
+        <p><input type = 'text' required name = 'Firstname'/></p> 
         <p><h3>Lastname</h3></p> 
         <p><input type = 'text' name = 'Lastname'/></p>
         <p><h3>Age</h3></p> 
-        <p><input type = 'text' name = 'Age'/></p>
+        <p><input type = 'text' required name = 'Age'/></p>
         <p><h3>grade</h3></p> 
-        <p><input type = 'text' name = 'grade'/></p>
+        <p><input type = 'text' required name = 'grade'/></p>
         <p><input type = 'submit' value = 'Submit'/></p> 
 </form> 
 <table id="mytab1">
