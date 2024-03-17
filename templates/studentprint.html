@@ -3,7 +3,20 @@
 <html> 
 
    <body> 
- 
+    <script>
+      function check_date() {
+        var Date1 = document.getElementById("fromday").value;
+        var Date2 = document.getElementById("today").value;
+        if(new Date(Date2)<=new Date(Date1))
+        {
+          alert('from date should be less than to date');
+          event.preventDefault();
+          
+        }
+        
+      }
+      </script>
+      
     <form method="GET" action={{url}}> 
       <!-- <form method="GET" action="https://python-web-test-softpost-new.azurewebsites.net/"> -->
        
@@ -123,7 +136,7 @@
       
         {% endfor %} 
         </table>
- <button type="submit">Print</button> 
+ <button type="submit" onclick="check_date();">Print</button> 
        
         
 </form> 

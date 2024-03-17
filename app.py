@@ -67,7 +67,7 @@ def data():
 
 @app.route('/printfill',methods=['POST','GET'])
 def printfill(): 
-#    pdb.set_trace()
+#    #pdb.set_trace()
     db = client.hopedatabase
     allstudents = db.datastudents
     slkey=request.form.getlist('selkeys')
@@ -103,7 +103,7 @@ def printfill():
         json.dump(dic, output_file) 
         output_file.write("\n")
     if(ee):
-        return render_template('vocastudent.html', firstname=result[0]['Firstname'],lastname=result[0]['Lastname'], stlevel=stlevel,stegr=stdegr,fromdate=request.form['fromd'],todate=request.form['tod'],resultsheader=['Date','Performance','Category', 'Sub Category','Firstname', 'Lastname'],rresult=ee, resultd=json.dumps(ee),file="dest_file") 
+        return render_template('vocastudent.html', url=url, firstname=result[0]['Firstname'],lastname=result[0]['Lastname'], stlevel=stlevel,stegr=stdegr,fromdate=request.form['fromd'],todate=request.form['tod'],resultsheader=['Date','Performance','Category', 'Sub Category','Firstname', 'Lastname'],rresult=ee, resultd=json.dumps(ee),file="dest_file") 
     else:
         return jsonify ( message="No data found for this time period",category="error", status=404)
 
@@ -127,7 +127,9 @@ def printstuff():
             result = []
             for i in per :
                 result.append(i)
-    
+           # pdb.set_trace()
+            if((level not in result[0]) or (degree not in result[0][level])):
+                 return render_template('done.html',url=url,data="data cant be printed as no data entered in this category")
             resdegree=result[0][level][degree]
             listkeys=[]
             stkeylevel=''
