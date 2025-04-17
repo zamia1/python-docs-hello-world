@@ -1,0 +1,13 @@
+ 
+    <form action="/get_file" method="post" >
+        {% for key,value in names.items() %}
+        {% for name in value %}
+        <li><a href="url_for('get_file',namef=name,gender=key,age=age_a)">{{key}} {{name}}</a></li>
+        
+        {% endfor %} 
+        {% endfor %}</ul>
+
+    <button type="submit">Submit</button>
+      
+    
+    </form>

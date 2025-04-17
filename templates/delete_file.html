@@ -1,0 +1,16 @@
+<form method="GET" action={{url}}/home>
+    <button type="submit" class="btn btn-primary"> Home</button>
+</form>
+    <form action="/delete_file" method="post" >
+        {% for key,value in names.items() %}
+        {% for name in value %}
+          <input type="checkbox" id='files' name='files[]' value="{{key}},{{name}}" />    
+        <label for='files'>{{key}} {{name}}</label>
+    </br>
+        {% endfor %} 
+        {% endfor %}
+      
+       <button type="submit">Delete</button>
+      
+    
+    </form>

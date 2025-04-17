@@ -1,284 +1,217 @@
-# from flask import Flask
-# from pymongo import MongoClient
-# from flask import jsonify, Flask, render_template, request
 
-import pandas as pd
-import numpy as np
-import os
-import glob
-import json
- 
-import pprint
-from json2html import *
 from pymongo import MongoClient
-from pathlib import Path
-from flask import jsonify, Flask, render_template, request, send_file
-from flask import Flask
+
+from flask import jsonify, render_template, request, url_for
+#, send_file
+from flask import Flask, flash, redirect, send_file
 import pdb
-import ast
-import os,subprocess
-from bson.objectid import ObjectId
-from itertools import chain
-FILE_SYSTEM_ROOT =os.getcwd()
+import mimetypes
+#import ast
+import os
+import io
+
+import gridfs
+import chardet
 
 app = Flask(__name__)
 
-arraylevels=[]
-stdate=''
-stdegr=''
-studentid=''
-levelst=''
-stkeylevel=''
-starraylevel={}
-stlevelone=''
-keydl=''
-bflag=True
-url= "http://python-web-test-softpost-new.azurewebsites.net/"
-#url= "http://127.0.0.1:5000"
-connection_string=os.environ.get('CONNECTION_STRING')
-#client = MongoClient('localhost', 27017)
-#client = MongoClient(connection_string)
+# Configure a secret key for Flask-Login
+app.secret_key =os.urandom(50)
+#url= "http://python-web-test-softpost-newh.azurewebsites.net/"
+#url="http://127.0.0.1:5000/"
+FILE_SYSTEM_ROOT =os.getcwd()
+
+
 client = MongoClient("mongodb+srv://mongodb:mongodb@cluster0.ps5mh8y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 # Get and Post Route
 bflag=True
-db = client.hopedatabase
-allstudents = db.datastudents
-@app.route('/index',methods=['GET'])
-@app.route('/',methods=['GET'])
-def index():
-    return render_template('home.html',url=url)
+db = client.dataghotkali
+gender=""
+age=""
+#allghotkali = db.dataghotkalicol
+ghotkali_collection = db['ghotali']
+users_collection = db['users']
 
 
-@app.route('/data',methods=['GET','POST'])
-def data(): 
+ages="25 years or younger,25-30 years,30-35 years,40-45 years"
+agetra=ages.split(',')
+def connectToDb(namesp):
+    fs = gridfs.GridFS(db,namesp)
+    return db, ghotkali_collection, fs
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
    # pdb.set_trace()
-    if request.method == "POST":
-        db = client.hopedatabase
-        allstudents = db.datastudents 
-        data=request.form.to_dict()
-        print(data)
-        allstudents.insert_one(data)
-        return render_template('allstudent.html',url=url, students=allstudents.find({}))
-    else:   
-        db = client.hopedatabase
-        allstudents = db.datastudents 
-        return render_template('allstudent.html', url=url,students=allstudents.find({}))
-  
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
 
-@app.route('/printfill',methods=['POST','GET'])
-def printfill(): 
-#    #pdb.set_trace()
-    db = client.hopedatabase
-    allstudents = db.datastudents
-    slkey=request.form.getlist('selkeys')
-    stkey=request.form['stkey']
-    stuid=request.form['stuid']
-    stlevel=request.form['stlevel']
-    stdegr=request.form['stdegr']
-    fromd=request.form['fromd']
-    tod=request.form['tod']
-    per=allstudents.find( { '_id':ObjectId(stuid)})
-           # pdb.set_trace()
-    result = []
-    for i in per :
-        result.append(i)
-    flatten_list=[]
-    category=[]
-    ee=[]
-    for skey in slkey:
-        li=list(chain.from_iterable(result[0][stlevel][stdegr][stkey][skey]))
-        
-        for eachd in li:
-            if((eachd['Date'] >= request.form['fromd']) and (eachd['Date'] <= request.form['tod'])):
-                eachd['subcat']=stkey 
-                eachd['cat']=skey
-                eachd['Firstname']=result[0]['Firstname']
-                eachd['Lastname']=result[0]['Lastname']
-                ee.append(eachd)
-  
-                 
-    #pdb.set_trace()
-    output_file = open("dest_file", 'w', encoding='utf-8')
-    for dic in flatten_list:
-        json.dump(dic, output_file) 
-        output_file.write("\n")
-    if(ee):
-        return render_template('vocastudent.html', url=url, firstname=result[0]['Firstname'],lastname=result[0]['Lastname'], stlevel=stlevel,stegr=stdegr,fromdate=request.form['fromd'],todate=request.form['tod'],resultsheader=['Date','Performance','Category', 'Sub Category','Firstname', 'Lastname'],rresult=ee, resultd=json.dumps(ee),file="dest_file") 
+        # Check if the username already exists
+        if users_collection.find_one({'username': username}):
+            flash('Username already exists. Choose a different one.', 'danger')
+        else:
+            users_collection.insert_one({'username': username, 'password': password})
+            flash('Registration successful. You can now log in.', 'success')
+            return redirect(url_for('login'))
+
+
+    return render_template('register.html')
+@app.route('/login', methods=['GET', 'POST'])
+@app.route('/',methods=['GET', 'POST'])
+def login():
+   # pdb.set_trace()
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        # Check if the username and password match
+        user = users_collection.find_one({'username': username, 'password': password})
+        if user:
+            #flash('Login successful.', 'success')
+            return render_template('home.html',url=request.url)
+            #return render_template('home.html',url=url)
+            # Add any additional logic, such as session management
+        else:
+            flash('Invalid username or password. Please try again.', 'danger')
+
+    return render_template('login.html')
+@app.route('/get_file/<namef>/<gender>', methods=['GET','POST'])
+def get_file(namef=None,gender=None):
+    # pdb.set_trace()
+    global agetra
+    if request.method=="POST":
+        gender=request.form['gender']
+        age=request.form['age']
+        db, collectn, fs = connectToDb(gender+age)
+        return render_template('get_file.html',url=request.url, names=fs.list(),gender=gender,age=age)
     else:
-        return jsonify ( message="No data found for this time period",category="error", status=404)
-
-@app.route('/printstuff',methods=['POST','GET'])
-def printstuff(): 
-    #pdb.set_trace()
-    db = client.hopedatabase
-    allstudents = db.datastudents
-    
-    if request.method == "POST":
-        if("bflag" not in request.form):
-            data_lines=[]
-           
-           
-            studentid=request.form['vehicle1']
-            degree=request.form['degree']
-            level=request.form['level']
-            print(studentid)
-            per=allstudents.find( { '_id':ObjectId(studentid)})
-         
-            result = []
-            for i in per :
-                result.append(i)
-           # pdb.set_trace()
-            if((level not in result[0]) or (degree not in result[0][level])):
-                 return render_template('done.html',url=url,data="data cant be printed as no data entered in this category")
-            resdegree=result[0][level][degree]
-            listkeys=[]
-            stkeylevel=''
-            #pdb.set_trace()
-            keylist=[]
-            for key,value in resdegree.items():
-                keylist.append(key)
-                listkeys.append({key:list(value.keys())})
-            #pdb.set_trace()
-            return render_template('levelstudents.html', lisk=listkeys,stuid=studentid,stdegr=degree,stlevel=level,fromd=request.form['fromday'],tod=request.form['today'])         
-        else:
-            #pdb.set_trace()
-            stkey=request.form['stkey']
-            stuid=request.form['stuid']
-            stlevel=request.form['stlevel']
-            stdegr=request.form['stdegr']
-            fromd=request.form['fromd']
-            tod=request.form['tod']
-            flatten_list=[]
-            per=allstudents.find( { '_id':ObjectId(stuid)})
-            result = []
-            for i in per :
-                result.append(i)
-            flatten_list=[]
-            category=[]
-            #pdb.set_trace()
-            finallist=[]
-            for key,value in result[0][stlevel][stdegr][stkey].items():
-                finallist.append(key)
-            return render_template('finallevelstudents.html', url=url,stkey=stkey,catfinallist=finallist,stuid=stuid,stdegr=stdegr,stlevel=stlevel,fromd=request.form['fromd'],tod=request.form['tod'])         
-        
-        
-    else:
-        db = client.hopedatabase
-        allstudents = db.datastudents
-        data=list(allstudents.find({}))
-      
-        if(data):
-            return render_template('studentprint.html',url=url, students=data)
-        else:
-            return jsonify ( message="No student found for this time period",category="error", status=404)
-def init(level,department):
-    db = client.hopedatabase
-    levels = db.datalevels.find({'_id':ObjectId('65f54c63540fb6a68ccb1852')})
-    result=[]
-    for i in levels:
-        result.append(i)
-    return result[0][level][department]
- 
-def getname(studentid):
-    per=allstudents.find( { '_id':ObjectId(studentid)})
-    result = []
-    for i in per:
-        result.append(i)
-    return result[0]['Firstname']+" " +result[0]['Lastname']    
-def checklevel(keylevel,lislevel,studentid,degree,level,date):
-    jsond={}
-    jsonlevel=[]
-
-    for k in lislevel[keylevel][0]:
-        item=k
-        if k==0:        
-            jsonlevel.append({'key':item,'value':'enabled'})
-        else:
-            datafind=level+'.'+degree+'.'+keylevel+'.'+item+'.'+"Performance"
-            if(checklevelper(level,degree,keylevel,item,studentid,datafind)):
-                jsonlevel.append({'key':item,'value':'enabled'})
+        if namef is not None:
+            db, collectn, fs = connectToDb(gender)    
+            file = fs.find_one({'filename': namef})
+            if file:
+                grid_out = fs.find_one({'filename': namef})
+                if grid_out:
+                    file_data = io.BytesIO(grid_out.read())
+                    #return send_file(file_data, mimetype='application/pdf', download_name=namef)
+               
+                    mimetype, _ = mimetypes.guess_type(namef)
+                    print(mimetype)
+                    if not mimetype:
+                        if namef.endswith(('.jpg', '.jpeg')):
+                            mimetype = 'image/jpeg'
+                        elif namef.endswith('.png'):
+                            mimetype = 'image/png'
+                        elif namef.endswith('.gif'):
+                            mimetype = 'image/gif'
+                        elif namef.endswith('.pdf'):
+                            mimetype = 'application/pdf'
+                        else:
+                            mimetype = 'application/octet-stream'
+                    return send_file(file_data, mimetype=mimetype, download_name=namef)
+                
+            
             else:
-                jsonlevel.append({'key':item,'value':'disabled'})
+                return "File not found", 404
 
-    return keylevel,jsonlevel
-    
-def checklevelper(level,degree,keydl,item,studentid,keytodata):
-    per=allstudents.find( { '_id':ObjectId(studentid)},)
-    result = []
-    for i in per :
-         result.append(i)
-    #pdb.set_trace()
-    if (level not in result[0]) or (degree not in result[0][level]) or( keydl not in result[0][level][degree]) or (item not in result[0][level][degree][keydl]):
-        return True
 
-    value=allstudents.find( { '_id':ObjectId(studentid)},{keytodata:'Performed'})
-    if(len(value[0][level][degree][keydl][item])>=3):
-        return False
-    return True
+    return render_template('filter.html')
+@app.route('/delete_file', methods=['POST','GET'])
+def delete_file():
+    global agetra
+    global db
 
-@app.route( '/filldata',methods=['POST'])
-def filldata():
-    #pdb.set_trace()
-    sdate=request.form['stdate']
-    suid=request.form['stuid']
-    sdegr=request.form['stdegr']
-    slevel=request.form['stlevel']
-    skeylevel=request.form['stkeylevel']
-    data=request.form.to_dict()
-    sname=getname(suid)
+    if request.method=="POST":
+        files=request.form.getlist('files[]')
+        for file in files:
+            rs=file.split(',')
+            gender=rs[0][0:4]
+            age=rs[0][4:len(rs[0])]
+            db, collectn, fs = connectToDb(gender+age)
+            for x in fs.find({'filename':rs[1] }).distinct('_id'):
+                fs.delete(x)
+                print('file' +rs[1] +'is deleted')
+
+        return jsonify({'message': 'file is deleted'}), 201
+    else:
+        agel=["boys","girl"]
+
+
+        rs=[]
+        files_a={}
+        for i in agel:
+            for j in agetra:
+                rs.append(i+j)
+        for i in rs:
+
+            # pdb.set_trace()
+            fs = gridfs.GridFS(db,i)
+
+            if len(fs.list())>0:
+                gender=i[0:4]
+                age=i[4:len(i)]
+                files_a[i]=fs.list()
+        # pdb.set_trace()        
+        return render_template('delete_file.html', names=files_a)
+
+
+    return render_template('filter.html')
+@app.route('/list_file',methods=['GET'])
+def list_file():
+    global db
+    # pdb.set_trace()
+    global agetra
+    agel=["boys","girl"]
+    rs=[]
+    files_a={}
+    for i in agel:
+        for j in agetra:
+
+            rs.append(i+j)
+    for i in rs:
+
+    #    pdb.set_trace()
+        fs = gridfs.GridFS(db,i)
+
+        if len(fs.list())>0:
+           # pdb.set_trace()
+            gender=i[0:4]
+            age=i[4:len(i)]
+            files_a[i]=fs.list()
+         
+    return render_template('get_file_all.html', names=files_a)
+
+@app.route('/home', methods=['GET'])
+def home():
+    return render_template('home.html')
+
+@app.route('/upload', methods=['GET','POST'])
+def upload():
+    # pdb.set_trace()
     if request.method == "POST":
-        if("bflag" not in request.form):
-            rs="Performed,didnot Performed,and/or performed"
-            perm=rs.split(',')
-            slevelone=request.form[skeylevel]
-            return render_template('vocfilldata.html', url=url,performance=perm,sclicklevel=slevelone,stdate=sdate,stname=sname,stuid=suid,stdegr=sdegr,
-                               stlevel=slevel, stkeylevel=skeylevel)
-                             
-        else:
-            perf=request.form['clicklevel']
-            per=allstudents.find( { '_id':ObjectId(suid)})
-            result = []
-            for i in per :
-                result.append(i)
-            datedata={'Date':sdate,'Performance':perf}
-            leveldata={}
+        names=request.form['names']
+        age=request.form['age']
+        filenamea=""
+        files = request.files.getlist("file[]")
+        for file in files: 
+            if file.filename.endswith('.pdf'):
+                filenamea=file.filename.replace(".pdf","")
+        for file in files:
+            if file.filename == '':
+                msg="No selected file"
+                return render_template('upload.html', msgs=msg)
 
-   
-          
-            allstudents.update_one( { '_id': ObjectId(suid) },{ "$push" : {slevel+'.'+sdegr+'.'+request.form['stkeylevel']+'.'+request.form['sclicklevel']:[datedata] }})
-          
-            return render_template('done.html',url=url,data="I am done")
-        
+            if file and file.filename.endswith('.pdf'):
+                db, collectn, fs = connectToDb(names+age)
+                file_id = fs.put(file, filename=file.filename)
+            elif file and file.filename.endswith('.jpeg'):
+                db, collectn, fs = connectToDb(names+age)
+                file_id = fs.put(file, filename=filenamea+"image")
+            else:
+                return render_template('upload.html', msgs='Only PDF files are allowed')
+        return render_template('upload.html',msgs='file is uploaded')
 
+    else:
+        return render_template('index.html')
 
-@app.route( '/insert',methods=['POST','GET'])
-def insert(): 
-   # pdb.set_trace()
-    if request.method == "POST":
-        date=request.form['date']
-        studentid=request.form['vehicle1']
-        degree=request.form['degree']
-        level=request.form['level']
-        data=request.form.to_dict()
-        namest=getname(studentid)
-        stru={}
-        if 'bflag' not in request.form:
-            lislevel={}
-            lislevel1st2nd={}
-            lislevel=init(level,degree)
-            for levele in lislevel:
-                jsond,arraylev=checklevel(levele,lislevel,studentid,degree,level,date)
-                lislevel1st2nd[levele]=arraylev
-            #pdb.set_trace()
-            return render_template('vocdetails.html',stdate=date,stname=namest,stuid=studentid,stlevel=level,stdegr=degree,comblevels=lislevel1st2nd)
-    
-    #pdb.set_trace()
-    return render_template('student.html', url=url,students=allstudents.find({}))
-   
-
-# # main driver function
-# if __name__ == '__main__':
- 
-#     # run() method of Flask class runs the application 
-#     # on the local development server.
-#     app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == '__main__':
+    app.run()
