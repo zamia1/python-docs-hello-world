@@ -12,6 +12,7 @@ import io
 
 import gridfs
 import chardet
+import magic
 
 app = Flask(__name__)
 
@@ -186,28 +187,35 @@ def home():
 
 @app.route('/upload', methods=['GET','POST'])
 def upload():
-    # pdb.set_trace()
+
     if request.method == "POST":
         names=request.form['names']
         age=request.form['age']
-        filenamea=""
+
         files = request.files.getlist("file[]")
-        for file in files: 
-            if file.filename.endswith('.pdf'):
-                filenamea=file.filename.replace(".pdf","")
         for file in files:
             if file.filename == '':
-                msg="No selected file"
+                msg = "No selected file"
                 return render_template('upload.html', msgs=msg)
+            file_bytes = file.read(2048)  # Read a chunk of the file
+            mime_type = magic.from_buffer(file_bytes, mime=True)
+            file.seek(0)  # Reset file pointer so fs.put() reads the full file
 
-            if file and file.filename.endswith('.pdf'):
-                db, collectn, fs = connectToDb(names+age)
+
+
+
+            if mime_type == 'application/pdf':
+                db, collectn, fs = connectToDb(names + age)
                 file_id = fs.put(file, filename=file.filename)
-            elif file and file.filename.endswith('.jpeg'):
-                db, collectn, fs = connectToDb(names+age)
-                file_id = fs.put(file, filename=filenamea+"image")
+            elif mime_type and mime_type.startswith('image/'):
+                db, collectn, fs = connectToDb(names + age)
+                file_id = fs.put(file, filename=(file.filename ), content_type=mime_type)
+
+              
             else:
-                return render_template('upload.html', msgs='Only PDF files are allowed')
+                return render_template('upload.html', msgs='Only PDF or image files are allowed')
+
+
         return render_template('upload.html',msgs='file is uploaded')
 
     else:
