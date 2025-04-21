@@ -6,14 +6,14 @@
     <form action="/get_file" method="post">
         <ul>
         {% for key, value in names.items() %}
+        <label for={{key}}>{{key}}</label><br>
             {% for name in value %}
             <li>
                 <input type="checkbox" name="files_to_delete" value="{{ key }}:{{ name }}">
-                <a href="{{ url_for('get_file', namef=name, gender=key) }}">{{ key }} {{ name }}</a>
+                <a href="{{ url_for('get_file', namef=name, gender=key) }}"> {{ name }}</a>
             </li>
             {% endfor %}
         {% endfor %}
         </ul>
    
     </form>
-    

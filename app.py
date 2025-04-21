@@ -1,12 +1,13 @@
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from pymongo import MongoClient
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 
 from flask import jsonify, render_template, request, url_for
 #, send_file
 from flask import Flask, flash, redirect, send_file
 import pdb
 import mimetypes
-#import ast
 import os
 import io
 
@@ -15,6 +16,10 @@ import chardet
 import magic
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Redirect to login if not logged in
+
 
 # Configure a secret key for Flask-Login
 app.secret_key =os.urandom(50)
@@ -36,49 +41,112 @@ users_collection = db['users']
 
 ages="25 years or younger,25-30 years,30-35 years,40-45 years"
 agetra=ages.split(',')
+class User(UserMixin):
+    def __init__(self, username):
+        self.id = username
+
+@login_manager.user_loader
+def load_user(user_id):
+    user = users_collection.find_one({'username': user_id})
+    if user:
+        return User(user_id)
+    return None
+
 def connectToDb(namesp):
     fs = gridfs.GridFS(db,namesp)
     return db, ghotkali_collection, fs
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-   # pdb.set_trace()
+    pdb.set_trace()
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
+        confirm_password = request.form['confirm_password']
 
-        # Check if the username already exists
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('register.html')
+
         if users_collection.find_one({'username': username}):
             flash('Username already exists. Choose a different one.', 'danger')
         else:
-            users_collection.insert_one({'username': username, 'password': password})
+            hashed_password = generate_password_hash(password)
+            users_collection.insert_one({'username': username, 'password': hashed_password,'email': email})
             flash('Registration successful. You can now log in.', 'success')
             return redirect(url_for('login'))
 
-
     return render_template('register.html')
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = users_collection.find_one({'email': email})
+        
+        if user:
+            return render_template('reset_password.html', username=user['username'])
+        else:
+            flash('Email not found', 'danger')
+
+    return render_template('forgot_password.html')
+@app.route('/reset_password', methods=['POST'])
+def reset_password():
+    username = request.form['username']
+    new_password = request.form['password']
+    
+    hashed_password = generate_password_hash(new_password)
+    
+    result = users_collection.update_one(
+        {'username': username},
+        {'$set': {'password': hashed_password}}
+    )
+    
+    if result.modified_count > 0:
+        flash('Password updated successfully.', 'success')
+    else:
+        flash('Error updating password.', 'danger')
+
+    return redirect(url_for('login'))
+
+@app.route('/forgot_username', methods=['GET', 'POST'])
+def forgot_username():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = users_collection.find_one({'email': email})
+        if user:
+            flash(f"Your username is: {user['username']}", 'info')
+        else:
+            flash("Email not found", 'danger')
+    return render_template('forgot_username.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))
+
+
 @app.route('/login', methods=['GET', 'POST'])
-@app.route('/',methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
-   # pdb.set_trace()
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        # Check if the username and password match
-        user = users_collection.find_one({'username': username, 'password': password})
-        if user:
-            #flash('Login successful.', 'success')
-            return render_template('home.html',url=request.url)
-            #return render_template('home.html',url=url)
-            # Add any additional logic, such as session management
+        user = users_collection.find_one({'username': username})
+        if user and check_password_hash(user['password'], password):
+            login_user(User(username))
+            flash('Login successful.', 'success')
+            return redirect(url_for('home'))
         else:
-            flash('Invalid username or password. Please try again.', 'danger')
-
+            flash('Invalid credentials', 'danger')
     return render_template('login.html')
+
 @app.route('/get_file/<namef>/<gender>', methods=['GET','POST'])
+@login_required
 def get_file(namef=None,gender=None):
-    # pdb.set_trace()
+    pdb.set_trace()
     global agetra
     if request.method=="POST":
         gender=request.form['gender']
@@ -117,6 +185,7 @@ def get_file(namef=None,gender=None):
 
     return render_template('filter.html')
 @app.route('/delete_file', methods=['POST','GET'])
+@login_required
 def delete_file():
     global agetra
     global db
@@ -157,6 +226,7 @@ def delete_file():
 
     return render_template('filter.html')
 @app.route('/list_file',methods=['GET'])
+@login_required
 def list_file():
     global db
     # pdb.set_trace()
@@ -186,6 +256,7 @@ def home():
     return render_template('home.html')
 
 @app.route('/upload', methods=['GET','POST'])
+@login_required
 def upload():
 
     if request.method == "POST":

@@ -3,9 +3,10 @@
 </form>
     <form action="/delete_file" method="post" >
         {% for key,value in names.items() %}
+        <label for={{key}}>{{key}}</label><br>
         {% for name in value %}
           <input type="checkbox" id='files' name='files[]' value="{{key}},{{name}}" />    
-        <label for='files'>{{key}} {{name}}</label>
+        <label for='files'> {{name}}</label>
     </br>
         {% endfor %} 
         {% endfor %}
