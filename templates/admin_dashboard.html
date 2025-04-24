@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Welcome Admin</h1>
+
+    <h2>User Management</h2>
+    <table border="1">
+        <tr>
+            <th>Username</th><th>Email</th><th>Role</th><th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+          
+                <form action="{{ url_for('delete_user') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="username" value="{{ user.username }}">
+                    <button type="submit">Delete</button>
+                </form>
+                {% if user.role == 'user' %}
+                    <form action="{{ url_for('promote_user') }}" method="post" style="display:inline;">
+                        <input type="hidden" name="username" value="{{ user.username }}">
+                        <button type="submit">Promote to Admin</button>
+                    </form>
+                {% elif user.role == 'admin' and user.username != current_user.id %}
+                    <form action="{{ url_for('demote_user') }}" method="post" style="display:inline;">
+                        <input type="hidden" name="username" value="{{ user.username }}">
+                        <button type="submit">Demote to User</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+   <br>
+    <a href="{{url}}/home">Home</a>
+    
+</body>
+</html>

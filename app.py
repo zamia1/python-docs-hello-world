@@ -14,7 +14,8 @@ import io
 import gridfs
 import chardet
 import magic
-
+from functools import wraps
+from flask import abort
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -22,7 +23,9 @@ login_manager.login_view = 'login'  # Redirect to login if not logged in
 
 
 # Configure a secret key for Flask-Login
-app.secret_key =os.urandom(50)
+app.secret_key = 'supersecretkey'  # Change to a secure, hard-to-guess value
+
+#app.secret_key =os.urandom(50)
 #url= "http://python-web-test-softpost-newh.azurewebsites.net/"
 #url="http://127.0.0.1:5000/"
 FILE_SYSTEM_ROOT =os.getcwd()
@@ -41,23 +44,85 @@ users_collection = db['users']
 
 ages="25 years or younger,25-30 years,30-35 years,40-45 years"
 agetra=ages.split(',')
-class User(UserMixin):
-    def __init__(self, username):
-        self.id = username
 
+admin_user = {
+    "username": "admin",
+    "password": generate_password_hash("admin123"),
+    "email": "zamia.chowdhury@gmail.com",
+    "role": "admin"
+}
+if users_collection.find_one({'username': "admin"}):
+    if None:
+        users_collection.insert_one(admin_user)
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or getattr(current_user, 'role', 'user') != 'admin':
+            abort(403)  # Forbidden
+        return f(*args, **kwargs)
+    return decorated_function
+
+class User(UserMixin):
+    def __init__(self, username,role='user'):
+        self.id = username
+        self.role = role
 @login_manager.user_loader
 def load_user(user_id):
     user = users_collection.find_one({'username': user_id})
     if user:
-        return User(user_id)
+        return User(user_id, role=user.get('role', 'user'))
     return None
 
 def connectToDb(namesp):
     fs = gridfs.GridFS(db,namesp)
     return db, ghotkali_collection, fs
+
+
+@app.route('/admin')
+@login_required
+@admin_required
+def admin_dashboard():
+    users = list(users_collection.find({}, {'_id': 0, 'username': 1, 'email': 1, 'role': 1}))
+    #users = list(users_collection.find({}, {'_id': 0, 'username': 1}))    
+    return render_template('admin_dashboard.html', users=users)
+
+@app.route('/promote_user', methods=['POST'])
+@login_required
+@admin_required
+def promote_user():
+    username = request.form['username']
+    users_collection.update_one({'username': username}, {'$set': {'role': 'admin'}})
+    flash(f'{username} promoted to admin.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/demote_user', methods=['POST'])
+@login_required
+@admin_required
+def demote_user():
+    username = request.form['username']
+    users_collection.update_one({'username': username}, {'$set': {'role': 'user'}})
+    flash(f'{username} demoted to user.', 'info')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/delete_user', methods=['POST'])
+@login_required
+@admin_required
+def delete_user():
+    username = request.form['username']
+    users_collection.delete_one({'username': username})
+    flash(f'{username} deleted.', 'danger')
+    return redirect(url_for('admin_dashboard'))
+
+# @app.route('/admin_dashboard')
+# @login_required
+# @admin_required
+# def admin_dashboard():
+#     return render_template('admin_dashboard.html')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    pdb.set_trace()
+    # pdb.set_trace()
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -68,29 +133,44 @@ def register():
             flash('Passwords do not match.', 'danger')
             return render_template('register.html')
 
-        if users_collection.find_one({'username': username}):
+        if users_collection.find_one({'username': username,'role':'user'}):
             flash('Username already exists. Choose a different one.', 'danger')
-        else:
-            hashed_password = generate_password_hash(password)
-            users_collection.insert_one({'username': username, 'password': hashed_password,'email': email})
-            flash('Registration successful. You can now log in.', 'success')
-            return redirect(url_for('login'))
+            return render_template('register.html')
+        # else:
+        hashed_password = generate_password_hash(password)
+        users_collection.insert_one({
+            'username': username,
+            'password': hashed_password,
+            'email': email,
+            'role': 'user'  # or 'admin' for admin users
+        })
+
+        flash('Registration successful. You can now log in.', 'success')
+        return redirect(url_for('login'))
 
     return render_template('register.html')
+            # users_collection.insert_one({'username': username, 'password': hashed_password,'email': email})
+            # flash('Registration successful. You can now log in.', 'success')
+            # return redirect(url_for('login'))
+
+    # return render_template('register.html')
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
+    # pdb.set_trace()
     if request.method == 'POST':
         email = request.form['email']
-        user = users_collection.find_one({'email': email})
+        user = users_collection.find_one({'email': email,'role':'user'})
         
         if user:
             return render_template('reset_password.html', username=user['username'])
         else:
             flash('Email not found', 'danger')
+        return redirect(url_for('login'))
 
     return render_template('forgot_password.html')
 @app.route('/reset_password', methods=['POST'])
 def reset_password():
+    # pdb.set_trace()
     username = request.form['username']
     new_password = request.form['password']
     
@@ -110,13 +190,16 @@ def reset_password():
 
 @app.route('/forgot_username', methods=['GET', 'POST'])
 def forgot_username():
+ 
     if request.method == 'POST':
         email = request.form['email']
-        user = users_collection.find_one({'email': email})
+        user = users_collection.find_one({'email': email,'role':'user'})
         if user:
             flash(f"Your username is: {user['username']}", 'info')
         else:
             flash("Email not found", 'danger')
+            return redirect(url_for('forgot_username')) # OR render_template('login.html')
+
     return render_template('forgot_username.html')
 
 
@@ -134,19 +217,24 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = users_collection.find_one({'username': username})
+        if(username!='admin'):
+            user = users_collection.find_one({'username': username,'role':'user'})
+        else:
+            user = users_collection.find_one({'username': username})
         if user and check_password_hash(user['password'], password):
-            login_user(User(username))
+            user_obj = User(username, role=user.get('role', 'user'))
+            login_user(user_obj)
             flash('Login successful.', 'success')
             return redirect(url_for('home'))
         else:
             flash('Invalid credentials', 'danger')
+            return redirect(url_for('login'))
+
     return render_template('login.html')
 
 @app.route('/get_file/<namef>/<gender>', methods=['GET','POST'])
 @login_required
 def get_file(namef=None,gender=None):
-    pdb.set_trace()
     global agetra
     if request.method=="POST":
         gender=request.form['gender']
@@ -186,6 +274,7 @@ def get_file(namef=None,gender=None):
     return render_template('filter.html')
 @app.route('/delete_file', methods=['POST','GET'])
 @login_required
+@admin_required
 def delete_file():
     global agetra
     global db
@@ -213,14 +302,13 @@ def delete_file():
                 rs.append(i+j)
         for i in rs:
 
-            # pdb.set_trace()
             fs = gridfs.GridFS(db,i)
 
             if len(fs.list())>0:
                 gender=i[0:4]
                 age=i[4:len(i)]
                 files_a[i]=fs.list()
-        # pdb.set_trace()        
+       
         return render_template('delete_file.html', names=files_a)
 
 

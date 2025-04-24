@@ -1,5 +1,9 @@
 
 <h1>Welcome to matchmaking site</h1>
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
+    <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+{% endif %}
+
     
 <form method="GET" action={{url}}/upload>
     <button type="submit" class="btn btn-primary"> Upload a bio</button>
